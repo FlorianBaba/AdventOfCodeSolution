@@ -55,5 +55,5 @@ function getAnswers($string)
 echo '***** Solution - Day 1 *****'.PHP_EOL.PHP_EOL;
 
 foreach (getAnswers($string) as $key => $answer) {
-    echo '- Part '.$key.' : '.$answer.PHP_EOL;
+    echo '- Part '.($key+1).' : '.$answer.PHP_EOL;
 }
