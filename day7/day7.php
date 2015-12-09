@@ -400,12 +400,10 @@ function getAnswer($string, $part = 1)
 
     $wires = ($wireList->getList());
 
-
     return 'The final signal for a is : '.$wires['a'];
 }
 
 echo '***** Solution - Day 7 *****'.PHP_EOL.PHP_EOL;
-
 
 foreach (array(1) as $part) {
     echo '- Part '.($part).' : '.getAnswer($string, $part).PHP_EOL;

@@ -29,9 +29,24 @@ class WireList
      */
     public function updateWireFromInstruction($instruction)
     {
-        $destinationWireKey = array_pop(explode(' -> ', $instruction));
-        $value = $this->deductValueFormInstruction($instruction);
+        list($fromInstruction, $destinationWireKey) = explode(' -> ', $instruction);
+        $value = $this->deductValueFromInstruction($fromInstruction);
         $this->updateWire($destinationWireKey, $value);
+    }
+
+    /**
+     * @param $item
+     * @return int
+     */
+    private function getValueFromItem($item)
+    {
+        try {
+            $value = $this->getNumberValue($item);
+        } catch (Exception $exception) {
+            $value = $this->getWireValueFormItem($item);
+        }
+
+        return $value;
     }
 
     /**
@@ -39,32 +54,39 @@ class WireList
      * @return bool|int|string
      * @throws ErrorException
      */
-    private function deductValueFormInstruction($instruction)
+    private function deductValueFromInstruction($instruction)
     {
-        switch ($this->getAction($instruction)) {
+        $action = $this->getAction($instruction);
+
+        $items = explode($action, $instruction);
+
+        $firstItem = isset($items[0]) ? trim($items[0]) : null;
+        $secondItem = isset($items[1]) ? trim($items[1]) : null;
+
+        switch ($action) {
 
             case 'SET':
-                $value = $this->getNumberValue($instruction);
+                $value = $this->getValueFromItem($firstItem);
                 break;
 
             case 'AND':
-                $value = $this->getFirstWireValue($instruction) & $this->getSecondWireValue($instruction);
+                $value = $this->getValueFromItem($firstItem) & $this->getValueFromItem($secondItem);
                 break;
 
             case 'OR':
-                $value = $this->getFirstWireValue($instruction) | $this->getSecondWireValue($instruction);
+                $value = $this->getValueFromItem($firstItem) | $this->getValueFromItem($secondItem);
                 break;
 
             case 'NOT':
-                $value = 65535 - $this->getFirstWireValue($instruction);
+                $value = 65535 - $this->getValueFromItem($secondItem);
                 break;
 
             case 'RSHIFT':
-                $value = $this->getFirstWireValue($instruction) >> $this->getNumberValue($instruction);
+                $value = $this->getValueFromItem($firstItem) >> $this->getValueFromItem($secondItem);
                 break;
 
             case 'LSHIFT':
-                $value = $this->getFirstWireValue($instruction) << $this->getNumberValue($instruction);
+                $value = $this->getValueFromItem($firstItem) << $this->getValueFromItem($secondItem);
                 break;
 
             default:
@@ -122,42 +144,27 @@ class WireList
     }
 
     /**
-     * @param $instruction
+     * @param $item
      * @return string
      * @throws ErrorException
      */
-    private function getFirstWireValue($instruction)
+    private function getWireValueFormItem($item)
     {
-        $key = array_shift($this->getWireKeys($instruction));
+        $key = $this->getWireKeyFormItem($item);
 
         return $this->getWireValue($key);
     }
 
     /**
-     * @param $instruction
+     * @param $item
      * @return string
      * @throws ErrorException
      */
-    private function getSecondWireValue($instruction)
+    private function getWireKeyFormItem($item)
     {
-        $wireKeys = $this->getWireKeys($instruction);
-        if (count($wireKeys) < 2) {
-            throw new ErrorException('No second key found in : '.$instruction);
-        }
-
-        return $this->getWireValue($wireKeys[1]);
-    }
-
-    /**
-     * @param $instruction
-     * @return string
-     * @throws ErrorException
-     */
-    private function getWireKeys($instruction)
-    {
-        preg_match_all('/[a-z]{1,2}/', $instruction, $matches);
+        preg_match('/[a-z]{1,2}/', $item, $matches);
         if (empty($matches)) {
-            throw new ErrorException('No key found in : '.$instruction);
+            throw new ErrorException('No key found in : '.$item);
         }
 
         return array_shift($matches);
