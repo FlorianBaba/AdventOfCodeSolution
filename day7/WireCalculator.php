@@ -4,8 +4,13 @@
  * User: FlorianBaba
  * Date: 08/12/15
  */
-class WireList
+class WireCalculator
 {
+    /**
+     * @var array
+     */
+    private $calculations;
+
     /**
      * @var array
      */
@@ -13,52 +18,88 @@ class WireList
 
     public function __construct()
     {
+        $this->calculations = array();
         $this->wires = array();
     }
 
     /**
-     * @return array
+     * @param $wireKey
+     * @throws ErrorException
      */
-    public function getList()
+    private function getCalculation($wireKey)
     {
-        return $this->wires;
+        if (!isset($this->calculations[$wireKey])) {
+            throw new ErrorException('No calculation found for '.$wireKey);
+        }
+
+        return $this->calculations[$wireKey];
+    }
+
+    /**
+     * @param $wireKey
+     * @return bool|int|string
+     * @throws ErrorException
+     */
+    public function getWireValue($wireKey)
+    {
+        $calculation = $this->getCalculation($wireKey);
+
+        return $this->getWireValueFromCalculation($calculation);
     }
 
     /**
      * @param $instruction
      */
-    public function updateWireFromInstruction($instruction)
+    public function updateCalculations($instruction)
     {
-        list($fromInstruction, $destinationWireKey) = explode(' -> ', $instruction);
-        $value = $this->deductValueFromInstruction($fromInstruction);
-        $this->updateWire($destinationWireKey, $value);
+        list($calculation, $wireKey) = explode(' -> ', $instruction);
+        $this->calculations[$wireKey] = $calculation;
+    }
+
+    /**
+     * @param $wireKey
+     * @param $value
+     */
+    public function updateWireValue($wireKey, $value)
+    {
+        $this->wires[$wireKey] = $value;
     }
 
     /**
      * @param $item
-     * @return int
+     * @return int|string
+     * @throws ErrorException
      */
     private function getValueFromItem($item)
     {
+        if ($item === null) {
+            throw new ErrorException('Item value is null');
+        }
+
         try {
             $value = $this->getNumberValue($item);
         } catch (Exception $exception) {
-            $value = $this->getWireValueFormItem($item);
+            $wireKey = $this->getWireKeyFormItem($item);
+            $calculation = $this->getCalculation($wireKey);
+            if (!isset($this->wires[$wireKey])) {
+                $this->updateWireValue($wireKey, $this->getWireValueFromCalculation($calculation));
+            }
+            $value = $this->wires[$wireKey];
         }
 
         return $value;
     }
 
     /**
-     * @param $instruction
+     * @param $calculation
      * @return bool|int|string
      * @throws ErrorException
      */
-    private function deductValueFromInstruction($instruction)
+    private function getWireValueFromCalculation($calculation)
     {
-        $action = $this->getAction($instruction);
+        $action = $this->getAction($calculation);
 
-        $items = explode($action, $instruction);
+        $items = explode($action, $calculation);
 
         $firstItem = isset($items[0]) ? trim($items[0]) : null;
         $secondItem = isset($items[1]) ? trim($items[1]) : null;
@@ -90,40 +131,11 @@ class WireList
                 break;
 
             default:
-                throw new ErrorException('No action found in : '.$instruction);
+                throw new ErrorException('No action found in : '.$calculation);
                 break;
         }
 
         return $value;
-    }
-
-    /**
-     * @param $wireKey
-     * @param $value
-     */
-    private function updateWire($wireKey, $value)
-    {
-        $this->initWire($wireKey);
-        $this->wires[$wireKey] = (int)$value;
-    }
-
-    /**
-     * @param $wireKey
-     * @return int
-     */
-    private function getWireValue($wireKey)
-    {
-        return !empty($this->wires[$wireKey]) ? (int)$this->wires[$wireKey] : 0;
-    }
-
-    /**
-     * @param $wireKey
-     */
-    private function initWire($wireKey)
-    {
-        if (empty($this->wires[$wireKey])) {
-            $this->wires[$wireKey] = 0;
-        }
     }
 
     /**
@@ -141,18 +153,6 @@ class WireList
         }
 
         return $action;
-    }
-
-    /**
-     * @param $item
-     * @return string
-     * @throws ErrorException
-     */
-    private function getWireValueFormItem($item)
-    {
-        $key = $this->getWireKeyFormItem($item);
-
-        return $this->getWireValue($key);
     }
 
     /**

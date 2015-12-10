@@ -382,7 +382,7 @@ NOT ac -> ad
 1 AND ht -> hu
 NOT hn -> ho';
 
-require_once(__DIR__.'/WireList.php');
+require_once(__DIR__.'/WireCalculator.php');
 
 /**
  * @param $string
@@ -392,19 +392,21 @@ require_once(__DIR__.'/WireList.php');
  */
 function getAnswer($string, $part = 1)
 {
-    $wireList = new WireList();
+    $wireList = new WireCalculator();
 
-    foreach (explode(PHP_EOL, $string) as $instruction) {
-        $wireList->updateWireFromInstruction($instruction);
+    if ($part === 2) {
+        $wireList->updateWireValue('b', 46065);
     }
 
-    $wires = ($wireList->getList());
+    foreach (explode(PHP_EOL, $string) as $instruction) {
+        $wireList->updateCalculations($instruction);
+    }
 
-    return 'The final signal for a is : '.$wires['a'];
+    return 'The final signal for a is : '.$wireList->getWireValue('a');
 }
 
 echo '***** Solution - Day 7 *****'.PHP_EOL.PHP_EOL;
 
-foreach (array(1) as $part) {
+foreach (array(1, 2) as $part) {
     echo '- Part '.($part).' : '.getAnswer($string, $part).PHP_EOL;
 }
