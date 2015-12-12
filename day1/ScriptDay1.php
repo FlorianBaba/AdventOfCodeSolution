@@ -32,7 +32,13 @@ class ScriptDay1 extends AbstractScriptDay
             }
         }
 
-        return ($part === 1) ? $actualLvl : $lvlEnterBasement;
+        if ($part === 1) {
+            $answer = 'The final lvl is '.$actualLvl;
+        } else {
+            $answer = 'The position of the character that causes Santa to first enter the basement is '.$lvlEnterBasement;
+        }
+
+        return $answer;
     }
 
     /**
