@@ -30,7 +30,6 @@ abstract class AbstractScriptDay
             } catch (Exception $exception) {
                 $txt .= 'Exception while executing part '.$part.' : '.$exception->getMessage().PHP_EOL;
             }
-
         }
 
         return $txt;
@@ -51,7 +50,7 @@ abstract class AbstractScriptDay
     {
         $this->instructionsFile->next();
 
-        return $this->instructionsFile->current();
+        return str_replace(PHP_EOL, '', $this->instructionsFile->current());
     }
 
     /**
