@@ -18,34 +18,7 @@
  * Now find one that starts with six zeroes.
  */
 
-$secretKey = 'iwrupvqb';
+require_once __DIR__.'/ScriptDay4.php';
 
-/**
- * @param string $secretKey
- * @param int $part
- * @param int $limit (1 billion by default)
- * @return string
- */
-function getAnswer($secretKey, $part = 1, $limit = 1000000000)
-{
-    $answer = 'No AdventCoin found son !';
-    $startOfMD5 = $part === 1 ? '00000' : '000000';
-
-    // searching in progress ...
-    for ($i = 0; $i < $limit; $i++) {
-
-        // yes ! we found it !
-        if (strpos(md5($secretKey.$i), $startOfMD5) === 0) {
-            $answer = 'The AdventCoin is : '.$i;
-            break;
-        }
-    }
-
-    return $answer;
-}
-
-echo '***** Solution - Day 4 *****'.PHP_EOL.PHP_EOL;
-
-foreach (array(1, 2) as $part) {
-    echo '- Part '.($part).' : '.getAnswer($secretKey, $part).PHP_EOL;
-}
+$scriptDay = new ScriptDay4();
+echo $scriptDay->getSolution();
