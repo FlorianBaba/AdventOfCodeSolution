@@ -21,7 +21,7 @@ abstract class AbstractScriptDay
      */
     public function getSolution()
     {
-        $txt = '***** Solution - '.$this->getName().' *****'.PHP_EOL;
+        $txt = 'Solution - '.$this->getName().' :'.PHP_EOL;
 
         foreach (array(1, 2) as $part) {
             try {
