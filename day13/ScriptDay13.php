@@ -15,11 +15,8 @@ class ScriptDay13 extends AbstractScriptDay
      */
     protected function getAnswer($part)
     {
-        if ($part != 1) {
-            return '';
-        }
-
-        $personCollection = new PersonCollection();
+        $includeMe = ($part === 2);
+        $personCollection = new PersonCollection($includeMe);
 
         while ($instruction = $this->getNextInstruction()) {
             $pattern = '/^(?P<subject>\w+) would (?<action>gain|lose) (?<points>\d+) happiness units by sitting next to (?P<neighbor>\w+).$/';
@@ -63,21 +60,6 @@ class ScriptDay13 extends AbstractScriptDay
         return __DIR__.'/instructions.txt';
     }
 
-    private function getPossibilities($items, $perms = array())
-    {
-        if (empty($items)) {
-//            echo join(' ', $perms) . "<br />";
-        } else {
-            for ($i = count($items) - 1; $i >= 0; --$i) {
-                $newitems = $items;
-                $newperms = $perms;
-                list($foo) = array_splice($newitems, $i, 1);
-                array_unshift($newperms, $foo);
-                $this->getPossibilities($newitems, $newperms);
-            }
-        }
-    }
-
     /**
      * @param PersonCollection $personCollection
      * @param array $tableConfiguration
@@ -106,8 +88,29 @@ class ScriptDay13 extends AbstractScriptDay
      */
     private function getTableConfigurationList(array $listPersonName)
     {
-        return array(
-            $listPersonName,
-        );
+        $configurationList = array();
+        $this->getPossibilities($listPersonName, array(), $configurationList);
+
+        return $configurationList;
+    }
+
+    /**
+     * @param $items
+     * @param array $perms
+     * @param array $results
+     */
+    private function getPossibilities($items, $perms = array(), &$results = array())
+    {
+        if (empty($items)) {
+            $results[] = $perms;
+        } else {
+            for ($i = count($items) - 1; $i >= 0; --$i) {
+                $newitems = $items;
+                $newperms = $perms;
+                list($foo) = array_splice($newitems, $i, 1);
+                array_unshift($newperms, $foo);
+                $this->getPossibilities($newitems, $newperms, $results);
+            }
+        }
     }
 }

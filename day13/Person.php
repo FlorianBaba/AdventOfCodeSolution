@@ -42,8 +42,6 @@ class Person
      */
     public function addPersonRelation($neighborName, $happinessPoints)
     {
-        // TODO => check if the relation does not exits yet
-
         $this->relationList[] = new PersonRelation($neighborName, $happinessPoints);
     }
 

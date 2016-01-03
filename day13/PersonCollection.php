@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__.'/Person.php';
+require_once __DIR__.'/MySelf.php';
 
 /**
  * @author: FlorianBaba
@@ -8,14 +9,29 @@ require_once __DIR__.'/Person.php';
  */
 class PersonCollection
 {
+    const MY_NAME = 'FlorianBaba';
+
     /**
      * @var Person[]
      */
     private $personList;
 
-    public function __construct()
+    /**
+     * @var bool
+     */
+    private $includeMe;
+
+    /**
+     * @param bool $includeMe
+     */
+    public function __construct($includeMe)
     {
         $this->personList = array();
+        $this->includeMe = $includeMe;
+
+        if ($this->includeMe) {
+            $this->personList[] = new MySelf(self::MY_NAME);
+        }
     }
 
     /**
@@ -77,6 +93,10 @@ class PersonCollection
         }
 
         $person = new Person($name);
+        if ($this->includeMe) {
+            $person->addPersonRelation(self::MY_NAME, 0);
+        }
+
         $this->personList[] = $person;
 
         return $person;
