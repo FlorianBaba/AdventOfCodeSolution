@@ -14,7 +14,7 @@ Exemple to get solution of day 3 :
 php getSolution.php 3
 ```
 
-BUT !
+BUT!
 -----
 
 Get the solution from this is what could be called cheating ...
