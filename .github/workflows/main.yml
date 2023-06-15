@@ -34,13 +34,9 @@ jobs:
         uses: actions/checkout@master
       - name: Create Release
         id: create_release
-        uses: actions/create-release@latest
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided automatically by github actions
+        uses: ncipollo/release-action@v1
         with:
-          tag_name: ${{ steps.versiontag.outputs.content }}
-          release_name: Release ${{ steps.versiontag.outputs.content }}
+          tag: ${{ steps.versiontag.outputs.content }}
+          name: Release ${{ steps.versiontag.outputs.content }}
           body: |
             ${{ github.event.pull_request.body }}
-          draft: false
-          prerelease: false
