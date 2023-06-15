@@ -8,7 +8,7 @@ Get a solution for a day
 
 It's very simple, you just have to launch the command below with the day of your choice.
 
-Exemple to get solution of day 3 :
+Exemple to get solution of day 3:
 
 ```bash
 php getSolution.php 3
