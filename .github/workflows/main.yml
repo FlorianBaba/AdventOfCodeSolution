@@ -34,6 +34,6 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ github.event.pull_request.title }}
-          name: Release {{ github.event.pull_request.title }}
+          name: Release ${{ github.event.pull_request.title }}
           body: |
             ${{ github.event.pull_request.body }}
