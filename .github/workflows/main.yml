@@ -1,0 +1,46 @@
+name: Release workflow
+
+on:
+  pull_request_target:
+    types:
+      - closed
+    branches:
+      - 'master'
+      
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  if_merged:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      # 1 - Read version tag from file
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - run: git config user.name "GitHub Actions Bot"
+      - run: git config user.email "<>"
+      - name: Read VERSIONTAG.md
+        id: versiontag
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./VERSIONTAG.md
+      - name: Log version tag
+        run: echo "${{ steps.versiontag.outputs.content }}"
+        
+      # 2 - Create tag and release
+      - name: Checkout master
+        uses: actions/checkout@master
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided automatically by github actions
+        with:
+          tag_name: ${{ steps.versiontag.outputs.content }}
+          release_name: Release ${{ steps.versiontag.outputs.content }}
+          body: |
+            ${{ github.event.pull_request.body }}
+          draft: false
+          prerelease: false
